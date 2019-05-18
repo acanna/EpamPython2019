@@ -7,8 +7,12 @@
 являются существенными.
 """
 
+from collections import Counter
+
+
 def is_permutation(a: str, b: str) -> bool:
     # Нужно проверить, являются ли строчки 'a' и 'b' перестановками
+    return Counter(a) == Counter(b)
 
 
 assert is_permutation('baba', 'abab')
