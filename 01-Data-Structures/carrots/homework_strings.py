@@ -33,26 +33,44 @@ P.S. За незакрытый файловый дескриптор - кара�
 
 """
 
+
+from collections import Counter
+
 # read the file dna.fasta
-dna = None
+with open('files/dna.fasta') as f:
+    dna = [x[:-1] for x in f.readlines()]
+
+starts = [i for i, x in enumerate(dna) if x.startswith('>')]
+descriptions = [dna[i] for i in starts]
+for i in starts:
+    dna[i] = '>'
+dnas = [x for x in ''.join(dna).split('>') if x]
+assert len(dnas)==len(starts)
+
+
+with open('files/dna.stats', 'w') as f:
+    for i, x in enumerate(starts):
+        f.write(descriptions[i] + '\n')
+        f.write(str(list(Counter(dnas[i]).items()))+'\n')
+
 
 
 def translate_from_dna_to_rna(dna):
     
     """your code here"""
-    
-    return rna
+    pass
+    # return rna
 
 
 def count_nucleotides(dna):
     
     """your code here"""
     
-    return num_of_nucleotides
+    # return num_of_nucleotides
 
 
 def translate_rna_to_protein(rna):
     
     """your code here"""
     
-    return protein
+    # return protein
