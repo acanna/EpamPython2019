@@ -33,44 +33,63 @@ P.S. За незакрытый файловый дескриптор - кара�
 
 """
 
-
 from collections import Counter
+
+with open('files/rna_codon_table.txt') as f:
+    table_data = f.read().split()
+    codon_table = {}
+    assert len(table_data) % 2 == 0
+    for i in range(len(table_data) // 2):
+        codon_table[table_data[2 * i]] = table_data[2 * i + 1]
+
+
+def translate_from_dna_to_rna(dna):
+    return dna.replace('T', 'U')
+
+
+def count_nucleotides(dna):
+    return sorted(list(Counter(dna).items()))
+
+
+def translate_rna_to_protein(rna):
+    rna = rna[:len(rna) - len(rna) % 3]
+    assert len(rna) % 3 == 0
+    protein = ''
+    for i in range(len(rna) // 3):
+        protein += codon_table[rna[i:i + 3]]
+    return protein
+
 
 # read the file dna.fasta
 with open('files/dna.fasta') as f:
     dna = [x[:-1] for x in f.readlines()]
 
 starts = [i for i, x in enumerate(dna) if x.startswith('>')]
+n = len(starts)
 descriptions = [dna[i] for i in starts]
+data = dna.copy()
 for i in starts:
-    dna[i] = '>'
-dnas = [x for x in ''.join(dna).split('>') if x]
-assert len(dnas)==len(starts)
+    data[i] = '>'
+dnas = [x for x in ''.join(data).split('>') if x]
+assert len(dnas) == len(starts)
 
-
+# статистика по количеству нуклеотидов в ДНК
 with open('files/dna.stats', 'w') as f:
-    for i, x in enumerate(starts):
+    for i in range(n):
         f.write(descriptions[i] + '\n')
-        f.write(str(list(Counter(dnas[i]).items()))+'\n')
+        f.write(str(count_nucleotides(dnas[i])) + '\n')
 
+# последовательность РНК для каждого гена
+with open('files/dna.rna', 'w') as f:
+    for line in dna:
+        if line.startswith('>'):
+            f.write(line + '\n')
+        else:
+            f.write(translate_from_dna_to_rna(line) + '\n')
 
-
-def translate_from_dna_to_rna(dna):
-    
-    """your code here"""
-    pass
-    # return rna
-
-
-def count_nucleotides(dna):
-    
-    """your code here"""
-    
-    # return num_of_nucleotides
-
-
-def translate_rna_to_protein(rna):
-    
-    """your code here"""
-    
-    # return protein
+# последовательность кодонов для каждого гена
+with open('files/dna.codon', 'w') as f:
+    for i in range(n):
+        f.write(descriptions[i] + '\n')
+        f.write(translate_rna_to_protein(
+            translate_from_dna_to_rna(dnas[i])) + '\n')
