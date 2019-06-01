@@ -52,12 +52,17 @@ def count_nucleotides(dna):
 
 
 def translate_rna_to_protein(rna):
-    rna = rna[:len(rna) - len(rna) % 3]
-    assert len(rna) % 3 == 0
+    proteins = []
+    stop_index = min(rna.find('UAA'), rna.find('UAG'), rna.find('UGA'))
     protein = ''
-    for i in range(len(rna) // 3):
-        protein += codon_table[rna[i:i + 3]]
-    return protein
+    for i in range(stop_index % 3, len(rna) - 2, 3):
+        if codon_table[rna[i:i + 3]] != 'Stop':
+            protein += codon_table[rna[i:i + 3]]
+        elif protein:
+            proteins.append(protein)
+            protein = ''
+
+    return proteins
 
 
 # read the file dna.fasta
@@ -91,5 +96,5 @@ with open('files/dna.rna', 'w') as f:
 with open('files/dna.codon', 'w') as f:
     for i in range(n):
         f.write(descriptions[i] + '\n')
-        f.write(translate_rna_to_protein(
-            translate_from_dna_to_rna(dnas[i])) + '\n')
+        f.write('\n'.join(translate_rna_to_protein(
+            translate_from_dna_to_rna(dnas[i]))) + '\n')
