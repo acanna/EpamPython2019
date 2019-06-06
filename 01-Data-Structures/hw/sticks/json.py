@@ -1,8 +1,6 @@
 from collections import Counter, defaultdict
 from statistics import mean
 
-from numpy import inf
-
 
 def parse(s):
     if s.startswith(': '):
@@ -20,8 +18,8 @@ def to_int(s):
 
 
 def max_min_stat_country(country_stats):
-    max_mean_stat = -inf
-    min_mean_stat = inf
+    max_mean_stat = -float('inf')
+    min_mean_stat = float('inf')
     max_countries = []
     min_countries = []
     for country in country_stats:
@@ -124,7 +122,7 @@ with open('winedata_full.json', 'w') as f:
     f.write('[')
     for i in range(len(wines) - 1):
         f.write(f'{{{wines[i][1]}}}, ')
-    f.write(f'{{{wines[len(wines) - 1]}}}]')
+    f.write(f'{{{wines[len(wines) - 1][1]}}}]')
 
 with open('stats.json', 'w') as f:
     f.write('{"statistics": {')
