@@ -1,3 +1,7 @@
+import functools
+import time
+from collections import deque
+
 # problem 6
 # answer = 250166416500
 answer = sum(range(1001)) ** 2 - sum(map(lambda x: x ** 2, range(1001)))
@@ -15,8 +19,9 @@ answer = [
 # problem 40
 # пару секунд надо подождать
 # answer = 210
-# s = reduce(lambda x, y: x + y, map(str, range(2 * 10 ** 5)))
-# answer = reduce(lambda x, y: x * y, [int(s[10 ** i]) for i in range(7)])
+s = functools.reduce(lambda x, y: x + y, map(str, range(2 * 10 ** 5)))
+answer = functools.reduce(lambda x, y: x * y,
+                          [int(s[10 ** i]) for i in range(7)])
 
 # problem 48
 # answer = 9110846700
@@ -55,3 +60,40 @@ assert collatz_steps(1000000) == 152
 assert collatz_steps_recursive(16) == 4
 assert collatz_steps_recursive(12) == 9
 assert collatz_steps_recursive(1000000) == 152
+
+
+def make_cache(time_):
+    def decorator(func):
+        storage = {}
+        time_q = deque()
+
+        @functools.wraps(func)
+        def inner(*args, **kwargs):
+            cur_time = time.time()
+            npop = 0
+            for k, t in time_q:
+                if t + time_ < cur_time:
+                    del storage[k]
+                    npop += 1
+                else:
+                    break
+            for _ in range(npop):
+                time_q.popleft()
+            key = (*args, *kwargs.items())
+            if key in storage:
+                return storage[key]
+            else:
+                storage[key] = func(*args, **kwargs)
+                time_q.append((key, time.time()))
+            return storage[key]
+
+        return inner
+
+    return decorator
+
+
+@make_cache(30)
+def slow_function(n):
+    '''Returns number of Collatz steps for n.'''
+    return 0 if n == 1 else slow_function(
+        n // 2 if n % 2 == 0 else 3 * n + 1) + 1
