@@ -37,12 +37,53 @@ PEP8 соблюдать строго, проверку делаю автотес
 К названием остальных переменных, классов и тд. подходить ответственно -
 давать логичные подходящие имена.
 """
+
 import datetime
+
+
+class Homework:
+    def __init__(self, text, days):
+        self.text = text
+        self.deadline_time = datetime.timedelta(days=days)
+        self.created_time = datetime.datetime.now()
+
+    def is_active(self):
+        return datetime.datetime.now() < self.created_time + self.deadline_time
+
+    @property
+    def created(self):
+        return str(self.created_time)
+
+    @property
+    def deadline(self):
+        return str(self.deadline_time)
+
+
+class Student:
+    def __init__(self, first_name, last_name):
+        self.first_name = first_name
+        self.last_name = last_name
+
+    def do_homework(self, hw):
+        if hw.is_active():
+            return hw
+        print('You are late')
+
+
+class Teacher:
+    def __init__(self, first_name, last_name):
+        self.first_name = first_name
+        self.last_name = last_name
+
+    @staticmethod
+    def create_homework(text, days):
+        return Homework(text, days)
 
 
 if __name__ == '__main__':
     teacher = Teacher('Daniil', 'Shadrin')
     student = Student('Roman', 'Petrov')
+    # наоборот должно быть, нет?
     teacher.last_name  # Daniil
     student.first_name  # Petrov
 

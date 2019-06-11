@@ -1,6 +1,5 @@
 import functools
 import time
-from collections import deque
 
 # problem 6
 # answer = 250166416500
@@ -65,26 +64,14 @@ assert collatz_steps_recursive(1000000) == 152
 def make_cache(time_):
     def decorator(func):
         storage = {}
-        time_q = deque()
 
         @functools.wraps(func)
         def inner(*args, **kwargs):
             cur_time = time.time()
-            npop = 0
-            for k, t in time_q:
-                if t + time_ < cur_time:
-                    del storage[k]
-                    npop += 1
-                else:
-                    break
-            for _ in range(npop):
-                time_q.popleft()
             key = (*args, *kwargs.items())
-            if key in storage:
-                return storage[key]
-            else:
-                storage[key] = func(*args, **kwargs)
-                time_q.append((key, time.time()))
+            if (key in storage and storage[key][0] + time_ > cur_time) or (
+                    key not in storage):
+                storage[key] = (cur_time, func(*args, **kwargs))
             return storage[key]
 
         return inner
