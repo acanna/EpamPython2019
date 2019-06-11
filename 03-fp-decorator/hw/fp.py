@@ -69,8 +69,7 @@ def make_cache(time_):
         def inner(*args, **kwargs):
             cur_time = time.time()
             key = (*args, *kwargs.items())
-            if (key in storage and storage[key][0] + time_ < cur_time) or (
-                    key not in storage):
+            if key not in storage or storage[key][0] + time_ < cur_time:
                 storage[key] = (cur_time, func(*args, **kwargs))
             return storage[key][1]
 
@@ -81,6 +80,7 @@ def make_cache(time_):
 
 @make_cache(30)
 def slow_function(n):
+    print(f'{n}\n')
     '''Returns number of Collatz steps for n.'''
     return 0 if n == 1 else slow_function(
         n // 2 if n % 2 == 0 else 3 * n + 1) + 1
