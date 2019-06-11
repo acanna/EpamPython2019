@@ -69,7 +69,7 @@ def make_cache(time_):
         def inner(*args, **kwargs):
             cur_time = time.time()
             key = (*args, *kwargs.items())
-            if (key in storage and storage[key][0] + time_ > cur_time) or (
+            if (key in storage and storage[key][0] + time_ < cur_time) or (
                     key not in storage):
                 storage[key] = (cur_time, func(*args, **kwargs))
             return storage[key]
