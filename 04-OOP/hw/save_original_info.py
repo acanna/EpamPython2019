@@ -21,13 +21,12 @@ import functools
 
 def save_original_info(original_func):
     def decorator(wrapper):
-        wrapper.__original_func = original_func
-        wrapper.__doc__ = original_func.__doc__
-        wrapper.__name__ = original_func.__name__
-
-        @functools.wraps(wrapper)
         def inner(*args, **kwargs):
             return wrapper(*args, **kwargs)
+
+        inner.__original_func = original_func
+        inner.__doc__ = original_func.__doc__
+        inner.__name__ = original_func.__name__
 
         return inner
 

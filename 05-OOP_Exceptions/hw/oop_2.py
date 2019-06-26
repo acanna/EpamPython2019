@@ -49,8 +49,67 @@ PEP8 соблюдать строго, проверку делаю автотес
 К названием остальных переменных, классов и тд. подходить ответственно -
 давать логичные подходящие имена.
 """
+
 import datetime
+
 from collections import defaultdict
+
+
+class Person:
+    def __init__(self, first_name, last_name):
+        self.first_name = first_name
+        self.last_name = last_name
+
+
+class Homework:
+    def __init__(self, text, days):
+        self.text = text
+        self.deadline = datetime.timedelta(days=days)
+        self.created = datetime.datetime.now()
+
+    def is_active(self):
+        return datetime.datetime.now() < self.created + self.deadline
+
+
+class DeadlineError(Exception):
+    pass
+
+
+class Student(Person):
+    def do_homework(self, hw, solution):
+        if hw.is_active():
+            return HomeworkResult(self, hw, solution)
+        raise DeadlineError('You are late')
+
+
+class Teacher(Person):
+    homework_done = defaultdict(set)
+
+    def check_homework(self, hw_res):
+        if len(hw_res.solution) > 5:
+            self.homework_done[hw_res.homework].add(hw_res)
+        return len(hw_res.solution) > 5
+
+    @classmethod
+    def reset_results(cls, hw=None):
+        if hw:
+            cls.homework_done[hw].clear()
+        else:
+            cls.homework_done.clear()
+
+    @staticmethod
+    def create_homework(text, days):
+        return Homework(text, days)
+
+
+class HomeworkResult:
+    def __init__(self, author, homework, solution):
+        if not isinstance(homework, Homework):
+            raise ValueError('You gave a not Homework object')
+        self.homework = homework
+        self.solution = solution
+        self.author = author
+        self.created = datetime.datetime.now()
 
 
 if __name__ == '__main__':

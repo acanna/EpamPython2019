@@ -9,9 +9,33 @@ reset_instances_counter - сбросить счетчик экземпляров
 Ниже пример использования
 """
 
+import functools
+
 
 def instances_counter(cls):
-    """Some code"""
+    cls._instances = 0
+
+    def get_created_instances(self=None):
+        return cls._instances
+
+    def reset_instances_counter(self=None):
+        n = cls.instances
+        cls.instances = 0
+        return n
+
+    def init_decorator(initf):
+        @functools.wraps(initf)
+        def inner(*args, **kwargs):
+            initf(*args, **kwargs)
+            cls._instances += 1
+
+        return inner
+
+    cls.__init__ = init_decorator(cls.__init__)
+
+    cls.get_created_instances = get_created_instances
+    cls.reset_instances_counter = reset_instances_counter
+
     return cls
 
 
@@ -21,7 +45,6 @@ class User:
 
 
 if __name__ == '__main__':
-
     User.get_created_instances()  # 0
     user, _, _ = User(), User(), User()
     user.get_created_instances()  # 3

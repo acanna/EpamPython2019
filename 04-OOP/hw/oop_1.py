@@ -44,19 +44,11 @@ import datetime
 class Homework:
     def __init__(self, text, days):
         self.text = text
-        self.deadline_time = datetime.timedelta(days=days)
-        self.created_time = datetime.datetime.now()
+        self.deadline = datetime.timedelta(days=days)
+        self.created = datetime.datetime.now()
 
     def is_active(self):
-        return datetime.datetime.now() < self.created_time + self.deadline_time
-
-    @property
-    def created(self):
-        return str(self.created_time)
-
-    @property
-    def deadline(self):
-        return str(self.deadline_time)
+        return datetime.datetime.now() < self.created + self.deadline
 
 
 class Student:
