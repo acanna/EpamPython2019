@@ -2,7 +2,7 @@
 Написать тесты(pytest) к предыдущим 3 заданиям, запустив которые, я бы смог бы проверить их корректность
 """
 import os
-
+import subprocess
 import pytest
 
 from task1 import PrintableFile, PrintableFolder
@@ -14,34 +14,35 @@ def test_printable_file():
     assert str(PrintableFile('file.txt')) == '-> file.txt'
 
 
-def test_printable_folder():
-    folder1 = PrintableFolder('../../04-OOP', os.walk('../../04-OOP'))
-    folder2 = PrintableFolder('../../05-OOP_Exceptions',
-                              os.walk('../../05-OOP_Exceptions'))
-    file1 = PrintableFile('../../04-OOP/hw/oop_1.py')
-    file2 = PrintableFile('../../05-OOP_Exceptions/hw/oop_2.py')
+@pytest.fixture()
+def printable_folder_resource():
+    subprocess.call(['mkdir','04-OOP'])
+    subprocess.call(['mkdir', '04-OOP/hw'])
+    subprocess.call(['touch', '04-OOP/OOP_1.pdf'])
+    subprocess.call(['touch', '04-OOP/hw/oop_1.py'])
+    subprocess.call(['touch', '04-OOP/hw/save_original_info.py'])
 
-    s1 = '''V ../../04-OOP
-|-> V ../../04-OOP/hw
+    yield '04-OOP'
+
+    subprocess.call(['rm', '-r', '04-OOP'])
+
+
+def test_printable_folder(printable_folder_resource):
+    folder = PrintableFolder('04-OOP', os.walk('04-OOP'))
+    file1 = PrintableFile('04-OOP/hw/oop_1.py')
+    file2 = PrintableFile('haha.txt')
+
+    s = '''V 04-OOP
+|-> V 04-OOP/hw
 |   |-> oop_1.py
 |   |-> save_original_info.py
-|-> OOP_1.pdf
-|-> OOP_1.pptx'''
+|-> OOP_1.pdf'''
 
-    s2 = '''V ../../05-OOP_Exceptions
-|-> V ../../05-OOP_Exceptions/hw
-|   |-> counter.py
-|   |-> oop_2.py
-|-> Exceptions.pptx
-|-> OOP_2.pptx
-|-> OOP_2.pdf
-|-> Exceptions.pdf'''
 
-    assert str(folder1) == s1
-    assert str(folder2) == s2
+    assert str(folder) == s
 
-    assert file1 in folder1
-    assert file2 not in folder1
+    assert file1 in folder
+    assert file2 not in folder
 
 
 @pytest.mark.parametrize('g, output', [
@@ -51,9 +52,14 @@ def test_printable_folder():
     ({'A': ['B', 'C', 'D'], 'B': ['C', 'D', 'E'], 'C': ['F'], 'D': ['A'],
       'E': [], 'F': []}, ['A', 'B', 'C', 'D', 'E', 'F'])
 ])
-def test_graph(g, output):
+def test_graph_1(g, output):
     assert [v for v in Graph(g)] == output
 
+def test_graph_2():
+    g = Graph({'A': ['B'], 'B': ['C'], 'C': []})
+    res = [('A', 'A'), ('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'B'),
+            ('B', 'C'), ('C', 'A'), ('C', 'B'), ('C', 'C')]
+    assert [(i, j) for i in g for j in g] == res
 
 def test_sipher():
     class CeasarSipher:

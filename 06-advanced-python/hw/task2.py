@@ -9,13 +9,13 @@ E - dict(<V> : [<V>, <V>, ...])
 from collections import deque
 
 
-class Graph:
-    def __init__(self, E):
-        self.E = E
+class GraphIterator:
+    def __init__(self, graph):
+        self.E = graph.E
         self._used = set()
         self._q = deque()
-        if E:
-            v = list(E)[0]
+        if self.E:
+            v = list(self.E)[0]
             self._used.add(v)
             self._q.append(v)
 
@@ -32,6 +32,15 @@ class Graph:
                 self._used.add(u)
         return v
 
+
+class Graph:
+    def __init__(self, E):
+        self.E = E
+
+    def __iter__(self):
+        return GraphIterator(self)
+
+
 if __name__ == '__main__':
 
     E = {'A': ['B', 'C', 'D'], 'B': ['C'], 'C': [], 'D': ['A']}
@@ -39,3 +48,6 @@ if __name__ == '__main__':
 
     for vertice in graph:
         print(vertice)
+    for i in graph:
+        for j in graph:
+            print(i,j)

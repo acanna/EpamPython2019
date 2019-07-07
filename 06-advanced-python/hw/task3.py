@@ -9,14 +9,13 @@ class ShiftDescriptor:
 
     def __init__(self, n):
         self.shift = n
-        self.label = str(time.time())
 
     def __get__(self, instance, owner):
         return ''.join(list(map(lambda s: chr(ord(s) + self.shift),
-                                getattr(instance, self.label))))
+                                self.value)))
 
     def __set__(self, instance, value):
-        setattr(instance, self.label, value)
+        self.value = value
 
 
 class CeasarSipher:
